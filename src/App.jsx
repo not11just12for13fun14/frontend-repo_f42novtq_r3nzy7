@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from './components/Hero.jsx';
 import Services from './components/Services.jsx';
+import CERConfigurator from './components/CERConfigurator.jsx';
 import Financing from './components/Financing.jsx';
 import Contact from './components/Contact.jsx';
 
@@ -9,6 +10,7 @@ function App() {
     <div className="min-h-screen bg-white text-slate-900">
       <Hero />
       <Services />
+      <CERConfigurator />
       <Financing />
       <Contact />
       <footer className="border-t mt-16">
@@ -16,6 +18,7 @@ function App() {
           <p>© {new Date().getFullYear()} Oktavia — Efficienza energetica per imprese e famiglie.</p>
           <nav className="flex items-center gap-6">
             <a href="#servizi" className="hover:text-slate-900 transition">Servizi</a>
+            <a href="#cer" className="hover:text-slate-900 transition">CER</a>
             <a href="#finanza" className="hover:text-slate-900 transition">Soluzioni finanziarie</a>
             <a href="#contatti" className="hover:text-slate-900 transition">Contatti</a>
           </nav>

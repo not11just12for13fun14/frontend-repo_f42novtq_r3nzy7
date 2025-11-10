@@ -1,59 +1,62 @@
 import React, { useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
 
-const Contact = () => {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+export default function Contact() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const onSubmit = (e) => {
     e.preventDefault();
-    // Frontend-only demo: mostra un messaggio di successo
     setSubmitted(true);
   };
 
   return (
-    <section id="contatti" className="py-20 bg-slate-50">
+    <section className="py-20">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Parliamo del tuo progetto</h2>
-            <p className="mt-4 text-slate-600">Che tu sia un’azienda, un comune o un privato, ti aiutiamo a identificare la soluzione più adatta per ridurre consumi e costi energetici.</p>
-            <div className="mt-6 space-y-3 text-slate-700">
-              <p className="flex items-center gap-3"><Mail className="w-5 h-5 text-emerald-600" /> info@oktavia.energy</p>
-              <p className="flex items-center gap-3"><Phone className="w-5 h-5 text-emerald-600" /> +39 000 000 000</p>
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold">Contattaci</h2>
+          <p className="text-white/70 mt-2">Parliamo del tuo impianto, incentivi e struttura finanziaria ideale.</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+            <div className="space-y-3 text-sm text-white/80">
+              <div className="flex items-center gap-2"><Mail size={16} className="text-emerald-300"/> info@oktavia.energy</div>
+              <div className="flex items-center gap-2"><Phone size={16} className="text-emerald-300"/> +39 02 1234 5678</div>
             </div>
+            <p className="text-xs text-white/50 mt-4">Audit preliminare gratuito per PMI selezionate.</p>
           </div>
-          <div>
-            <form onSubmit={onSubmit} className="bg-white rounded-xl ring-1 ring-slate-200 p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">Nome</label>
-                  <input name="name" value={form.name} onChange={onChange} required className="mt-1 w-full rounded-md border-slate-300 focus:border-emerald-500 focus:ring-emerald-500" />
+
+          <form onSubmit={onSubmit} className="rounded-xl border border-white/10 bg-white/5 p-6">
+            {!submitted ? (
+              <>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-white/80 mb-1">Nome</label>
+                    <input value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" placeholder="Il tuo nome" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-white/80 mb-1">Email</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" placeholder="nome@azienda.it" />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">Email</label>
-                  <input type="email" name="email" value={form.email} onChange={onChange} required className="mt-1 w-full rounded-md border-slate-300 focus:border-emerald-500 focus:ring-emerald-500" />
+                <div className="mt-4">
+                  <label className="block text-sm text-white/80 mb-1">Messaggio</label>
+                  <textarea rows={4} value={message} onChange={(e) => setMessage(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" placeholder="Raccontaci obiettivi e tempistiche" />
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Telefono</label>
-                <input name="phone" value={form.phone} onChange={onChange} className="mt-1 w-full rounded-md border-slate-300 focus:border-emerald-500 focus:ring-emerald-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Messaggio</label>
-                <textarea name="message" rows={5} value={form.message} onChange={onChange} className="mt-1 w-full rounded-md border-slate-300 focus:border-emerald-500 focus:ring-emerald-500" />
-              </div>
-              <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-md font-medium transition">Invia richiesta</button>
-              {submitted && (
-                <p className="text-emerald-700 text-sm">Grazie! Ti contatteremo al più presto.</p>
-              )}
-            </form>
-          </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-xs text-white/60">Risposta entro 24 ore</span>
+                  <button className="px-5 py-2 rounded-md bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition-colors">Invia</button>
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-emerald-300">Grazie! Ti ricontatteremo a breve.</div>
+            )}
+          </form>
         </div>
       </div>
     </section>
   );
-};
-
-export default Contact;
+}

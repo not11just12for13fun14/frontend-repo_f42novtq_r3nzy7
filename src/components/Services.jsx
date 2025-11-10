@@ -1,69 +1,64 @@
 import React from 'react';
-import { Sun, Building2, Users, Car, Network, Gauge } from 'lucide-react';
+import { Gauge, Users, Building2, CreditCard, Landmark, TrendingUp } from 'lucide-react';
 
-const services = [
+const cards = [
   {
-    icon: Sun,
-    title: 'Fotovoltaico',
-    desc:
-      'Progettazione e installazione per aziende e privati. Accesso a incentivi come Transizione 5.0 e Nuova Sabatini.'
-  },
-  {
-    icon: Network,
-    title: 'Comunità Energetiche Rinnovabili (CER)',
-    desc:
-      'Supporto completo nella costituzione e gestione, con vantaggi dai fondi PNRR e incentivi GSE.'
-  },
-  {
-    icon: Car,
-    title: 'E-Mobility',
-    desc:
-      'Stazioni di ricarica intelligenti con gestione e condivisione per flotte e utenti privati.'
-  },
-  {
-    icon: Gauge,
-    title: 'Sistemi di Efficientamento (EMS)',
-    desc:
-      'Dispositivi per ottimizzare l’impedenza e ridurre le perdite, migliorando l’efficienza in ambito residenziale e business.'
+    icon: TrendingUp,
+    title: 'Fotovoltaico & Storage',
+    desc: 'Progettazione e EPC con focus su autoconsumo e peak shaving. EMS integrato per il massimo rendimento.',
   },
   {
     icon: Users,
-    title: 'Gruppi di Autoconsumo Collettivo',
-    desc:
-      'Soluzioni per condomini per ottimizzare produzione e consumo di energia rinnovabile.'
+    title: 'Comunità Energetiche (CER)',
+    desc: 'Set-up tecnico-legale, pratiche GSE, configurazioni per gruppi di autoconsumo e condomini.',
   },
   {
     icon: Building2,
-    title: 'Soluzioni per il mondo Business',
-    desc:
-      'Dalla diagnosi energetica alla realizzazione turnkey con monitoraggio continuo delle performance.'
-  }
+    title: 'Efficientamento & EMS',
+    desc: 'Audit energetico e controllo intelligente dei carichi per ridurre consumi e aumentare resilienza.',
+  },
+  {
+    icon: CreditCard,
+    title: 'Soluzioni Finanziarie',
+    desc: 'Leasing, microcredito Urania, factoring: strutturiamo l’operazione per cassa e P&L.',
+  },
+  {
+    icon: Gauge,
+    title: 'E-Mobility',
+    desc: 'Infrastrutture di ricarica e integrazione con FV per flotti aziendali e retail.',
+  },
+  {
+    icon: Landmark,
+    title: 'Incentivi & PNRR',
+    desc: 'Transizione 5.0, Nuova Sabatini e bandi locali: massimizziamo l’incentivo cumulabile.',
+  },
 ];
 
-const Services = () => {
+export default function Services() {
   return (
-    <section id="servizi" className="py-20 bg-slate-50">
+    <section className="py-20">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-3xl">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Soluzioni per un futuro elettrico e sostenibile</h2>
-          <p className="mt-3 text-slate-600">
-            Dalla consulenza alla realizzazione, ci occupiamo di tutto il ciclo del progetto con partner e prodotti selezionati.
-          </p>
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold">Servizi principali</h2>
+            <p className="text-white/70 mt-2">Un pacchetto completo per performance, incentivi e cassa.</p>
+          </div>
+          <span className="hidden md:inline text-xs px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white/80">Approccio end-to-end</span>
         </div>
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="group rounded-xl bg-white ring-1 ring-slate-200 p-6 hover:shadow-lg transition">
-              <div className="inline-flex items-center justify-center w-11 h-11 rounded-lg bg-emerald-100 text-emerald-700">
-                <Icon className="w-5 h-5" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cards.map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="group rounded-xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                  <Icon size={18} />
+                </div>
+                <h3 className="font-semibold">{title}</h3>
               </div>
-              <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-              <p className="mt-2 text-sm text-slate-600 leading-relaxed">{desc}</p>
+              <p className="text-white/70 mt-3 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
       </div>
     </section>
   );
-};
-
-export default Services;
+}

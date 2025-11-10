@@ -1,156 +1,115 @@
 import React, { useMemo, useState } from 'react';
-import { Sun, Users, Gauge, TrendingUp } from 'lucide-react';
+import { Sun, Users, Gauge, Leaf } from 'lucide-react';
 
-const format = (n) => n.toLocaleString('it-IT');
-
-const CERConfigurator = () => {
-  const [powerKw, setPowerKw] = useState(40); // Potenza impianto
-  const [members, setMembers] = useState(12); // Numero utenze/condomini
-  const [selfCons, setSelfCons] = useState(65); // % autoconsumo
+export default function CERConfigurator() {
+  const [powerKW, setPowerKW] = useState(50); // kW
+  const [members, setMembers] = useState(20);
+  const [selfConsumption, setSelfConsumption] = useState(60); // %
   const [energyPrice, setEnergyPrice] = useState(0.22); // €/kWh
 
-  // Assunzioni semplici e conservative per stima
-  const kwhPerKwYear = 1200; // produzione media annua per kW installato
-  const gseTariff = 0.11; // €/kWh incentivo condiviso (indicativo)
-
   const results = useMemo(() => {
-    const production = powerKw * kwhPerKwYear; // kWh/anno
-    const sharedKwh = production * (selfCons / 100);
-    const savings = sharedKwh * energyPrice; // € risparmiati su energia non acquistata
-    const incentives = sharedKwh * gseTariff; // € da tariffa GSE per energia condivisa
-    const total = savings + incentives;
-    const perMember = members > 0 ? total / members : 0;
-    const co2Factor = 0.4; // kg CO2 evitati per kWh (mix medio)
-    const co2SavedTons = (production * co2Factor) / 1000;
+    const specificYield = 1300; // kWh/kW/anno (stima Italia Centro-Nord)
+    const production = powerKW * specificYield; // kWh/anno
+    const shared = production * (selfConsumption / 100);
 
-    return { production, sharedKwh, savings, incentives, total, perMember, co2SavedTons };
-  }, [powerKw, kwhPerKwYear, selfCons, energyPrice, gseTariff, members]);
+    const saving = shared * energyPrice; // € risparmiati su energia condivisa
+    const incentiveTariff = 0.11; // €/kWh incentivo GSE (indicativo)
+    const incentives = shared * incentiveTariff;
+
+    const totalBenefit = saving + incentives;
+    const perMember = members > 0 ? totalBenefit / members : 0;
+    const co2Factor = 0.35 / 1000; // tCO2 per kWh (0.35 kg/kWh)
+    const co2Saved = production * co2Factor; // tonnellate
+
+    return { production, shared, saving, incentives, totalBenefit, perMember, co2Saved };
+  }, [powerKW, members, selfConsumption, energyPrice]);
+
+  const Stat = ({ label, value, suffix, highlight }) => (
+    <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+      <p className="text-xs text-white/60">{label}</p>
+      <p className={`mt-1 text-lg font-semibold ${highlight ? 'text-emerald-300' : ''}`}>
+        {value}
+        {suffix}
+      </p>
+    </div>
+  );
+
+  const format = (num, digits = 0) => new Intl.NumberFormat('it-IT', { maximumFractionDigits: digits }).format(num);
+  const euro = (num) => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(num);
 
   return (
-    <section id="cer" className="py-20 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/70 via-white to-white pointer-events-none" />
-      <div className="max-w-7xl mx-auto px-6 relative">
-        <div className="flex flex-col lg:flex-row items-start gap-10">
-          <div className="flex-1">
-            <span className="inline-flex items-center gap-2 text-emerald-800 bg-emerald-100 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-              <TrendingUp className="w-4 h-4" /> Configuratore rapido
-            </span>
-            <h2 className="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight">
-              Comunità Energetiche Rinnovabili: stima benefici immediata
-            </h2>
-            <p className="mt-3 text-slate-600 max-w-2xl">
-              Seleziona i parametri chiave e ottieni una proiezione di risparmio, incentivi e impatto ambientale.
-              Dati indicativi — per un piano esecutivo ti guidiamo noi.
-            </p>
+    <section className="py-20">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold">Configuratore CER</h2>
+            <p className="text-white/70 mt-2">Stima istantanea di produzione, risparmi e impatti ambientali.</p>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+            <Gauge size={14} /> Configuratore rapido
+          </div>
+        </div>
 
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl ring-1 ring-slate-200 p-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                  <Sun className="w-4 h-4 text-emerald-600" /> Potenza impianto (kW)
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Controls */}
+          <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+            <div className="space-y-6">
+              <div>
+                <label className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2 text-white/80"><Sun size={16} className="text-amber-300"/> Potenza impianto</span>
+                  <span className="text-white/70">{powerKW} kW</span>
                 </label>
-                <input
-                  type="range"
-                  min={5}
-                  max={500}
-                  step={5}
-                  value={powerKw}
-                  onChange={(e) => setPowerKw(parseInt(e.target.value))}
-                  className="w-full mt-3"
-                />
-                <div className="mt-2 text-slate-700 font-semibold">{powerKw} kW</div>
+                <input type="range" min="5" max="1000" step="5" value={powerKW} onChange={(e) => setPowerKW(Number(e.target.value))} className="w-full accent-emerald-500" />
               </div>
 
-              <div className="bg-white rounded-xl ring-1 ring-slate-200 p-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                  <Users className="w-4 h-4 text-emerald-600" /> Numero utenze/membri
+              <div>
+                <label className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2 text-white/80"><Users size={16} className="text-blue-300"/> Membri</span>
+                  <span className="text-white/70">{members}</span>
                 </label>
-                <input
-                  type="range"
-                  min={3}
-                  max={100}
-                  step={1}
-                  value={members}
-                  onChange={(e) => setMembers(parseInt(e.target.value))}
-                  className="w-full mt-3"
-                />
-                <div className="mt-2 text-slate-700 font-semibold">{members} membri</div>
+                <input type="range" min="2" max="300" step="1" value={members} onChange={(e) => setMembers(Number(e.target.value))} className="w-full accent-emerald-500" />
               </div>
 
-              <div className="bg-white rounded-xl ring-1 ring-slate-200 p-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                  <Gauge className="w-4 h-4 text-emerald-600" /> Autoconsumo (%)
+              <div>
+                <label className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2 text-white/80"><Leaf size={16} className="text-emerald-300"/> Autoconsumo</span>
+                  <span className="text-white/70">{selfConsumption}%</span>
                 </label>
-                <input
-                  type="range"
-                  min={30}
-                  max={95}
-                  step={1}
-                  value={selfCons}
-                  onChange={(e) => setSelfCons(parseInt(e.target.value))}
-                  className="w-full mt-3"
-                />
-                <div className="mt-2 text-slate-700 font-semibold">{selfCons}%</div>
+                <input type="range" min="20" max="100" step="1" value={selfConsumption} onChange={(e) => setSelfConsumption(Number(e.target.value))} className="w-full accent-emerald-500" />
               </div>
 
-              <div className="bg-white rounded-xl ring-1 ring-slate-200 p-5">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                  €/kWh energia acquistata
-                </label>
-                <div className="mt-3 flex items-center gap-3">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.05"
-                    max="0.60"
-                    value={energyPrice}
-                    onChange={(e) => setEnergyPrice(parseFloat(e.target.value || '0'))}
-                    className="w-32 rounded-md border-slate-300 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
-                  <span className="text-sm text-slate-500">€/kWh</span>
-                </div>
+              <div>
+                <label className="block text-sm text-white/80 mb-1">Prezzo energia (€/kWh)</label>
+                <input type="number" step="0.01" min="0" value={energyPrice} onChange={(e) => setEnergyPrice(Number(e.target.value))} className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
               </div>
+
+              <p className="text-xs text-white/50">Valori indicativi. Per una simulazione completa, contattaci: ottimizziamo incentivi e struttura finanziaria.</p>
             </div>
           </div>
 
-          <div className="flex-1 w-full">
-            <div className="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl">
-              <h3 className="text-xl font-semibold">Risultati stimati</h3>
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-slate-800/60 rounded-lg p-4">
-                  <div className="text-slate-300 text-xs uppercase">Produzione annua</div>
-                  <div className="mt-2 text-2xl font-bold">{format(results.production)} kWh</div>
-                  <div className="text-slate-400 text-sm">Impianto {powerKw} kW · {kwhPerKwYear} kWh/kW</div>
-                </div>
-                <div className="bg-slate-800/60 rounded-lg p-4">
-                  <div className="text-slate-300 text-xs uppercase">Energia condivisa</div>
-                  <div className="mt-2 text-2xl font-bold">{format(Math.round(results.sharedKwh))} kWh</div>
-                  <div className="text-slate-400 text-sm">Autoconsumo {selfCons}%</div>
-                </div>
-                <div className="bg-slate-800/60 rounded-lg p-4">
-                  <div className="text-slate-300 text-xs uppercase">Risparmio + incentivi</div>
-                  <div className="mt-2 text-2xl font-bold">€ {format(Math.round(results.total))}</div>
-                  <div className="text-slate-400 text-sm">Risparmio € {format(Math.round(results.savings))} · Incentivi € {format(Math.round(results.incentives))}</div>
-                </div>
-                <div className="bg-slate-800/60 rounded-lg p-4">
-                  <div className="text-slate-300 text-xs uppercase">Benefit per membro</div>
-                  <div className="mt-2 text-2xl font-bold">€ {format(Math.round(results.perMember))}/anno</div>
-                  <div className="text-slate-400 text-sm">{members} partecipanti</div>
-                </div>
-              </div>
-              <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <a href="#contatti" className="inline-flex items-center justify-center bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-5 py-3 rounded-md font-semibold transition">
-                  Richiedi una simulazione completa
-                </a>
-                <p className="text-slate-400 text-sm">
-                  Riduzione CO₂ stimata: <span className="font-semibold text-white">{results.co2SavedTons.toFixed(1)} t/anno</span>
-                </p>
-              </div>
+          {/* Results */}
+          <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-white/5 p-6">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Stat label="Produzione annua" value={format(results.production, 0)} suffix=" kWh" />
+              <Stat label="Energia condivisa" value={format(results.shared, 0)} suffix=" kWh" />
+              <Stat label="Risparmio stimato" value={euro(results.saving)} highlight />
+              <Stat label="Incentivi GSE" value={euro(results.incentives)} />
+            </div>
+            <div className="mt-4 grid sm:grid-cols-2 gap-4">
+              <Stat label="Beneficio totale" value={euro(results.totalBenefit)} highlight />
+              <Stat label="per membro / anno" value={euro(results.perMember)} />
+            </div>
+            <div className="mt-6 p-4 rounded-lg bg-white/5 border border-white/10 text-sm flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white/80"><Leaf size={16} className="text-emerald-300"/> CO₂ evitata</div>
+              <div className="font-semibold">{format(results.co2Saved, 1)} t/anno</div>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="#contact" className="px-5 py-2 rounded-md bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition-colors">Richiedi simulazione completa</a>
+              <a href="#services" className="px-5 py-2 rounded-md bg-white/10 border border-white/15 hover:bg-white/15 transition-colors">Scopri le opzioni finanziarie</a>
             </div>
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default CERConfigurator;
+}
